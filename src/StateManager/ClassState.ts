@@ -37,16 +37,26 @@ export abstract class ClassState {
     }
 
     private static getStates() {
-        return getCurrentInstance()?.proxy?._sStatesManager ?? null
+        // return getCurrentInstance()?.proxy?._sStatesManager ?? null
+        return ClassState.app.config.globalProperties._sStatesManager
     }
 
+
+
     static statOf<T extends ClassState>(context: string) {
-        const state = ClassState.app.config.globalProperties._sStatesManager
+        const state = this.getStates()
 
         if (!state || !state[context]) {
             throw new Error('Failed to load Store state repository')
         }
         return state[context] as T
+    }
+    static keysOfState(){
+        const states = this.getStates()
+        console.log(states)
+        if(!states)
+            return []
+        return Object.keys(states).map((key: string) => key)
     }
 }
 

@@ -11,11 +11,13 @@
 </template>
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
-import {AppState} from "./AppState.ts";
+import {AppState, AppState2} from "./AppState.ts";
 import {ClassState} from "./StateManager/ClassState.ts";
 import {onBeforeMount, onMounted} from "vue";
 
 const appState = AppState.instance
+const appState2 = AppState2.instance
+
 let fromGLobalState: AppState | null = null
 
 function storeRes() {

@@ -62,14 +62,19 @@ export default class Setup {
     }
 
     protected static startInspectorTree(inspectorId: string) {
-        const classState = ClassState.statOf('appState')
-        const nodes: Array<CustomInspectorNode> = [Setup.getClassStatesOf(classState)]
 
-        Setup.api.on.getInspectorTree((payload, _) => {
-            if (payload.inspectorId === inspectorId) {
-                payload.rootNodes = nodes
-            }
-        })
+        for (const context of ClassState.keysOfState()) {
+            console.log("Context ", context)
+            const classState = ClassState.statOf(context)
+            const nodes: Array<CustomInspectorNode> = [Setup.getClassStatesOf(classState)]
+
+            Setup.api.on.getInspectorTree((payload, _) => {
+                if (payload.inspectorId === inspectorId) {
+                    payload.rootNodes = nodes
+                }
+            })
+        }
+
     }
 
     private static getClassStatesOf(state: ClassState): CustomInspectorNode {
@@ -82,13 +87,15 @@ export default class Setup {
         Object.keys(state).forEach((key: string) => {
             if (key === 'context')
                 return
+
             if (isRef(state[key as keyof ClassState])) {
-                console.log("Heyyy")
+
                 Setup.api.on.getInspectorState((payload, _) => {
                     if (payload.nodeId !== nodeId)
                         return
+                    console.log("The Same",payload.nodeId , nodeId)
                     if (!(payload.state))
-                        payload.state = {state:[]}
+                        payload.state = {state: []}
 
                     payload.state['state'].push(Setup.createStateInspector(key, state[key as keyof ClassState]))
                 })
@@ -100,7 +107,7 @@ export default class Setup {
 
     static createStateInspector(key: string, value: MaybeRef<unknown>): StateBase {
         const state: StateBase = {
-            key, value: isRef(value)? value.value:value
+            key, value: isRef(value) ? value.value : value
         }
         return state
     }
